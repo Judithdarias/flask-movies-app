@@ -4,4 +4,4 @@ def register_routes(app):
 
     @app.get("/")
     def home():
-        return "pruebaaaaa"
+        return render_template("search.html")
