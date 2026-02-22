@@ -1,0 +1,9 @@
+<ul>
+  {% for m in results %}
+    <li>
+      <a href="/movie/{{ m.imdbID }}">
+        {{ m.Title }} ({{ m.Year }})
+      </a>
+    </li>
+  {% endfor %}
+</ul>

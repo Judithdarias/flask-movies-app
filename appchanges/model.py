@@ -3,80 +3,55 @@ from appchanges.config import OMDB_API_KEY, OMDB_BASE_URL
 
 class ModelMovies:
     def __init__(self):
-        self.url = ""
-        self.response = None
-        self.objeto_general = None
-
-        # para la búsqueda
-        self.title = None
-        self.year = None
-        self.results = []     # lista de películas (Search)
-        self.message = None   # mensajes tipo "Movie not found!"
-
-        # para el detalle
-        self.imdb_id = None
+        self.results = []
+        self.message = None
         self.movie_detail = None
 
     def searchMovies(self, title, year=""):
-        self.title = (title or "").strip()
-        self.year = (year or "").strip()
-        self.results = []
-        self.message = None
+        title = (title or "").strip()
+        year = (year or "").strip()
 
-        if self.title == "":
+        if title == "":
             raise Exception("El título es obligatorio")
 
-        # Construimos la URL con params
-        params = {
-            "apikey": OMDB_API_KEY,
-            "s": self.title,
-            "type": "movie"
-        }
-        if self.year != "":
-            params["y"] = self.year
+        params = {"apikey": OMDB_API_KEY, "s": title, "type": "movie"}
+        if year:
+            params["y"] = year
 
-        try:
-            self.response = consulta.get(OMDB_BASE_URL, params=params, timeout=10)
-        except Exception:
-            raise Exception("Error conectando con OMDb")
+        response = consulta.get(OMDB_BASE_URL, params=params, timeout=10)
 
-        if self.response.status_code != 200:
-            raise Exception("Error en consulta http")
+        if response.status_code != 200:
+            raise Exception(f"HTTP {response.status_code} - {response.text}")
 
-        self.objeto_general = self.response.json()
+        data = response.json()
 
-        # OMDb usa Response: "False" cuando no hay resultados
-        if self.objeto_general.get("Response") == "False":
-            self.message = self.objeto_general.get("Error", "Sin resultados")
+        if data.get("Response") == "False":
+            self.message = data.get("Error", "Sin resultados")
             self.results = []
             return
 
-        self.results = self.objeto_general.get("Search", [])
+        self.message = None
+        self.results = data.get("Search", [])
 
     def getMovieDetail(self, imdb_id):
-        self.imdb_id = (imdb_id or "").strip()
-        self.movie_detail = None
 
-        if self.imdb_id == "":
-            raise Exception("imdb_id inválido")
-
-        params = {
+        datos_peticion = {
             "apikey": OMDB_API_KEY,
-            "i": self.imdb_id,
+            "i": imdb_id,
             "plot": "full"
-        }
+    }
 
-        try:
-            self.response = consulta.get(OMDB_BASE_URL, params=params, timeout=10)
-        except Exception:
-            raise Exception("Error conectando con OMDb")
+        respuesta = consulta.get(OMDB_BASE_URL, params=datos_peticion, timeout=10)
 
-        if self.response.status_code != 200:
+        if respuesta.status_code != 200:
             raise Exception("Error en consulta http")
 
-        self.objeto_general = self.response.json()
+        datos = respuesta.json()
 
-        if self.objeto_general.get("Response") == "False":
-            raise Exception(self.objeto_general.get("Error", "No encontrada"))
+        if datos.get("Response") == "False":
+            raise Exception(datos.get("Error", "No encontrada"))
 
-        self.movie_detail = self.objeto_general
+        self.movie_detail = datos
+
+
+        
