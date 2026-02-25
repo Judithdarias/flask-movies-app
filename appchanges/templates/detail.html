@@ -1,20 +1,25 @@
 <hr>
-
+<a href="/">← Volver al inicio</a>
 <h2>Comentarios</h2>
 
-{% if comentarios and comentarios|length > 0 %}
-  <ul>
-    {% for c in comentarios %}
-      <li>
-        <strong>{{ c.persona }}</strong> ({{ c.fecha }}): {{ c.comentario }}
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No hay comentarios todavía.</p>
-{% endif %}
+
+<div style="max-height: 250px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+  {% if comentarios and comentarios|length > 0 %}
+    <ul>
+      {% for c in comentarios %}
+        <li>
+          <strong>{{ c.persona }}</strong> ({{ c.fecha }}): {{ c.comentario }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No hay comentarios todavía.</p>
+  {% endif %}
+</div>
+
 
 <h3>Nuevo comentario</h3>
+
 
 <form action="/movie/{{ movie.imdbID }}/comentario" method="post">
   <label>Nombre</label>
