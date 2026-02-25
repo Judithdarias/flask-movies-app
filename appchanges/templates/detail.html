@@ -1,10 +1,27 @@
-<pre>{{ movie }}</pre>
+<hr>
 
-<h1>{{ movie.Title }} ({{ movie.Year }})</h1>
+<h2>Comentarios</h2>
 
-<p><strong>Director:</strong> {{ movie.Director }}</p>
-<p><strong>Actores:</strong> {{ movie.Actors }}</p>
+{% if comentarios and comentarios|length > 0 %}
+  <ul>
+    {% for c in comentarios %}
+      <li>
+        <strong>{{ c.persona }}</strong> ({{ c.fecha }}): {{ c.comentario }}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No hay comentarios todavía.</p>
+{% endif %}
 
-<p>{{ movie.Plot }}</p>
+<h3>Nuevo comentario</h3>
 
-<a href="/">Volver</a>
+<form action="/movie/{{ movie.imdbID }}/comentario" method="post">
+  <label>Nombre</label>
+  <input type="text" name="persona">
+
+  <label>Comentario</label>
+  <textarea name="comentario"></textarea>
+
+  <button type="submit">Guardar</button>
+</form>

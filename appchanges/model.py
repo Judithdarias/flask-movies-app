@@ -1,5 +1,7 @@
 import requests as consulta
 from appchanges.config import OMDB_API_KEY, OMDB_BASE_URL
+import sqlite3
+from datetime import datetime
 
 class ModelMovies:
     def __init__(self):
@@ -53,5 +55,39 @@ class ModelMovies:
 
         self.movie_detail = datos
 
+def insert_comentario(id_pelicula, persona, comentario):
+
+    conn = sqlite3.connect("data/movies.sqlite")
+    cursor = conn.cursor()
+
+    fecha = datetime.now().strftime("%Y-%m-%d")
+
+    cursor.execute(
+        "INSERT INTO comentarios (id_pelicula, persona, comentario, fecha) VALUES (?,?,?,?)",
+        (id_pelicula, persona, comentario, fecha)
+    )
+
+    conn.commit()
+    conn.close()
+    
+def select_comentarios_por_pelicula(id_pelicula):
+
+    conn = sqlite3.connect("data/movies.sqlite")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT persona, comentario, fecha FROM comentarios WHERE id_pelicula = ? ORDER BY id DESC",
+        (id_pelicula,)
+    )
+
+    filas = cursor.fetchall()
+    conn.close()
+
+    lista = []
+    for f in filas:
+        lista.append(dict(f))
+
+    return lista
 
         
