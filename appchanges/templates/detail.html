@@ -1,22 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+<a href="/">← Volver</a>
+
+<h1>{{ movie.Title }} ({{ movie.Year }})</h1>
+
+{% if movie.Poster != "N/A" %}
+  <img src="{{ movie.Poster }}" width="200">
+{% endif %}
+
+<p><strong>Director:</strong> {{ movie.Director }}</p>
+<p><strong>Actores:</strong> {{ movie.Actors }}</p>
+<p>{{ movie.Plot }}</p>
+
 <hr>
+
+<h2>Calificación</h2>
+<p>Promedio: {{ promedio }} / 5</p>
+
+<p>
+{% for i in range(1,6) %}
+  {% if i <= promedio|round(0,'floor') %}★{% else %}☆{% endif %}
+{% endfor %}
+</p>
+
 <hr>
-<
+
+<h2>Tu opinión</h2>
+
+<form action="/movie/{{ movie.imdbID }}/feedback" method="post">
+  <input type="text" name="persona" placeholder="Tu nombre"><br><br>
+
+  <select name="puntuacion">
+    <option value="">Puntuación</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select><br><br>
+
+  <textarea name="comentario" placeholder="Comentario"></textarea><br><br>
+
+  <button type="submit">Enviar</button>
+</form>
+
+<hr>
+
 <h2>Comentarios</h2>
 
-<div style="max-height: 250px; overflow-y: auto; padding: 10px; border: 1px solid #ddd; background: #fafafa;">
+{% if comentarios %}
+  {% for c in comentarios %}
+    <p>
+      <strong>{{ c.persona }}</strong> ({{ c.fecha }})<br>
+      {{ c.comentario }}
+    </p>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>No hay comentarios todavía.</p>
+{% endif %}
 
-    {% if comentarios and comentarios|length > 0 %}
-        {% for c in comentarios %}
-            <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0;">
-                <strong>{{ c.persona }}</strong>
-                <small style="color: gray;">({{ c.fecha }})</small>
-                <p style="margin: 5px 0;">{{ c.comentario }}</p>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No hay comentarios todavía.</p>
-    {% endif %}
-
-</div>
-
-
+{% endblock %}
