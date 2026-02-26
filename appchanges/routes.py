@@ -25,20 +25,54 @@ def register_routes(app):
         try:
             model.getMovieDetail(imdb_id)
             comentarios = select_comentarios_por_pelicula(imdb_id)
-            return render_template("detail.html", movie=model.movie_detail, comentarios=comentarios)
+
+            promedio = model.obtener_promedio(imdb_id)
+
+            return render_template(
+                "detail.html",
+                movie=model.movie_detail,
+                comentarios=comentarios,
+                promedio=promedio
+            )
         except Exception as e:
             return render_template("error.html", message=str(e))
+    @app.post("/movie/<imdb_id>/feedback")
+    def guardar_feedback(imdb_id):
+        persona = request.form.get("persona", "").strip()
+        comentario = request.form.get("comentario", "").strip()
+        puntuacion = request.form.get("puntuacion", "").strip()
 
-    @app.post("/movie/<imdb_id>/comentario")
-    def guardar_comentario(imdb_id):
-        persona = request.form.get("persona", "")
-        comentario = request.form.get("comentario", "")
+        if persona == "":
+            return render_template("error.html", message="El nombre es obligatorio")
 
-        if persona == "" or comentario == "":
-            return render_template("error.html", message="Nombre y comentario son obligatorios")
+        # si no envía nada (ni comentario ni puntuación)
+        if comentario == "" and puntuacion == "":
+            return render_template("error.html", message="Escribe un comentario o selecciona una puntuación")
 
-        try:
+        # guardar comentario si viene
+        if comentario != "":
             insert_comentario(imdb_id, persona, comentario)
-            return redirect(f"/movie/{imdb_id}")
-        except Exception as e:
-            return render_template("error.html", message=str(e))
+
+        # guardar puntuación si viene
+        if puntuacion != "":
+            try:
+                puntuacion_int = int(puntuacion)
+            except:
+                return render_template("error.html", message="Puntuación inválida")
+
+            if puntuacion_int < 1 or puntuacion_int > 5:
+                return render_template("error.html", message="La puntuación debe estar entre 1 y 5")
+
+            model.insert_calificacion(imdb_id, persona, puntuacion_int)
+
+        return redirect(f"/movie/{imdb_id}")
+        
+    @app.get("/movie/<imdb_id>/calificar/<int:puntuacion>")
+    def calificar(imdb_id, puntuacion):
+
+        if puntuacion < 1 or puntuacion > 5:
+            return render_template("error.html", message="Puntuación inválida")
+
+        model.insert_calificacion(imdb_id, puntuacion)
+        return redirect(f"/movie/{imdb_id}")
+    

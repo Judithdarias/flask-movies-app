@@ -55,6 +55,39 @@ class ModelMovies:
 
         self.movie_detail = datos
 
+    def obtener_promedio(self, id_pelicula):
+
+        conn = sqlite3.connect("data/movies.sqlite")
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT AVG(puntuacion) FROM Calificaciones WHERE id_pelicula = ?",
+            (id_pelicula,)
+        )
+
+        resultado = cursor.fetchone()
+        conn.close()
+
+        if resultado[0] is None:
+            return 0
+
+        return round(resultado[0], 1)
+    
+    def insert_calificacion(self, id_pelicula, persona, puntuacion):
+
+        conn = sqlite3.connect("data/movies.sqlite")
+        cursor = conn.cursor()
+
+        fecha = datetime.now().strftime("%Y-%m-%d")
+
+        cursor.execute(
+            "INSERT INTO Calificaciones (id_pelicula, persona, puntuacion, fecha) VALUES (?,?,?,?)",
+            (id_pelicula, persona, puntuacion, fecha)
+        )
+
+        conn.commit()
+        conn.close()
+
 def insert_comentario(id_pelicula, persona, comentario):
 
     conn = sqlite3.connect("data/movies.sqlite")
@@ -69,7 +102,7 @@ def insert_comentario(id_pelicula, persona, comentario):
 
     conn.commit()
     conn.close()
-    
+
 def select_comentarios_por_pelicula(id_pelicula):
 
     conn = sqlite3.connect("data/movies.sqlite")
@@ -90,4 +123,6 @@ def select_comentarios_por_pelicula(id_pelicula):
 
     return lista
 
-        
+    
+
+    

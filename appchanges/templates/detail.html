@@ -1,5 +1,6 @@
 <hr>
-
+<hr>
+<
 <h2>Comentarios</h2>
 
 <div style="max-height: 250px; overflow-y: auto; padding: 10px; border: 1px solid #ddd; background: #fafafa;">
@@ -18,18 +19,4 @@
 
 </div>
 
-<h3>Nuevo comentario</h3>
 
-<form action="/movie/{{ movie.imdbID }}/comentario" method="post">
-
-    <div style="margin-bottom: 10px;">
-        <input type="text" name="persona" placeholder="Tu nombre" style="width: 100%;">
-    </div>
-
-    <div style="margin-bottom: 10px;">
-        <textarea name="comentario" placeholder="Escribe tu comentario" style="width: 100%; height: 80px;"></textarea>
-    </div>
-
-    <button type="submit" style="padding:8px 15px;">Guardar comentario</button>
-
-</form>
